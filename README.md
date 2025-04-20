@@ -1,10 +1,11 @@
-# Tauri + Vue + TypeScript
+# Tauri + Vue + TypeScript + FastAPI
+Based on Tauri official template for Vue 3 + Vite + TypeScript.
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This template is a starting point for building applications with Tauri, Vue 3, Vite, TypeScript, and FastAPI. It provides a basic structure and configuration to help you get started quickly.
 
 ## Recommended IDE Setup
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) +[ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
 
 ## Type Support For `.vue` Imports in TS
 
