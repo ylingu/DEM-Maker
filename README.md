@@ -5,7 +5,7 @@ This template is a starting point for building applications with Tauri, Vue 3, V
 
 ## Recommended IDE Setup
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) +[ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
+- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) +[Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
 
 ## Type Support For `.vue` Imports in TS
 

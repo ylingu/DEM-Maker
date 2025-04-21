@@ -18,7 +18,19 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": {
+        "default-src": [
+          "'self'",
+          "tauri:",
+          "data:",
+          "http://localhost:8000"
+        ],
+        "style-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "tauri:"
+        ]
+      }
     }
   },
   "bundle": {

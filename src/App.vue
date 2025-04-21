@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { fetch } from '@tauri-apps/plugin-http';
 
 const greetMsg = ref("");
 const name = ref("");

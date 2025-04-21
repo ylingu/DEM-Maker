@@ -6,7 +6,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://localhost:5520",
+    allow_origin_regex=r"http://localhost:\d+$",
     allow_methods=["POST", "GET"],
     allow_headers=["Content-Type"],
 )
