@@ -11,3 +11,7 @@ dependencies = [
 dev = [
     "nuitka>=2.6.9",
 ]
+
+[tool.ruff.lint]
+extend-select = ["I", "N", "PL", "UP", "E501", "NPY", "RUF100"]
+unfixable = ["F401"]

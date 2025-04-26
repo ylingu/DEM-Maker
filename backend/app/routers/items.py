@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
 import json
 import os
+
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter(
     prefix="/items",
@@ -12,8 +13,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_dir, '..', 'data', 'items.json')
 normalized_path = os.path.normpath(data_path)
 
-# 4. 使用绝对路径打开文件
-with open(normalized_path, 'r', encoding='utf-8') as f:
+
+with open(normalized_path, encoding='utf-8') as f:
     fake_items_db = json.load(f)
 
 
