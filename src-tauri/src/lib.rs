@@ -1,8 +1,14 @@
+#[cfg(not(debug_assertions))]
 use command_group::{CommandGroup, GroupChild};
+#[cfg(not(debug_assertions))]
 use std::process::Command;
-use std::sync::{Arc, Mutex};
-use tauri::{Manager, State, WindowEvent};
+#[cfg(not(debug_assertions))]
+use std::sync::{Arc, Mutex}; 
+#[cfg(not(debug_assertions))]
+use tauri::{Manager, State};
+use tauri::WindowEvent; 
 
+#[cfg(not(debug_assertions))]
 struct ManagedChildProcess(Arc<Mutex<Option<GroupChild>>>);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -20,6 +26,9 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
+            #[cfg(debug_assertions)]
+            let _ = app; 
+
             #[cfg(not(debug_assertions))]
             {
                 let process = Command::new("backend")
@@ -30,18 +39,28 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|app_handle, event| {
+            #[cfg(debug_assertions)]
+            let _ = app_handle; 
+
             match event {
                 WindowEvent::CloseRequested { api, .. } => {
+                    #[cfg(debug_assertions)]
+                    let _ = api;
+
                     #[cfg(not(debug_assertions))]
                     {
                         println!("Window close requested. Attempting to kill sidecar...");
-                        api.prevent_close(); // Prevent the window from closing immediately
+                        api.prevent_close(); 
                         let state: State<ManagedChildProcess> = app_handle.state();
                         let mut child_lock = state.inner().0.lock().unwrap();
-                        let mut child_process = child_lock.take().unwrap();
-                        child_process
-                            .kill()
-                            .expect("Failed to kill sidecar process");
+                        if let Some(mut child_process) = child_lock.take() {
+                            child_process
+                                .kill()
+                                .expect("Failed to kill sidecar process");
+                            println!("Sidecar process killed successfully.");
+                        } else {
+                            println!("Sidecar process was already None or taken.");
+                        }
                         app_handle.app_handle().exit(0);
                     }
                 }
