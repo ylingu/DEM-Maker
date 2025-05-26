@@ -3,10 +3,10 @@ use command_group::{CommandGroup, GroupChild};
 #[cfg(not(debug_assertions))]
 use std::process::Command;
 #[cfg(not(debug_assertions))]
-use std::sync::{Arc, Mutex}; 
+use std::sync::{Arc, Mutex};
+use tauri::WindowEvent;
 #[cfg(not(debug_assertions))]
 use tauri::{Manager, State};
-use tauri::WindowEvent; 
 
 #[cfg(not(debug_assertions))]
 struct ManagedChildProcess(Arc<Mutex<Option<GroupChild>>>);
@@ -14,6 +14,7 @@ struct ManagedChildProcess(Arc<Mutex<Option<GroupChild>>>);
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_websocket::init())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .target(tauri_plugin_log::Target::new(
@@ -27,7 +28,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             #[cfg(debug_assertions)]
-            let _ = app; 
+            let _ = app;
 
             #[cfg(not(debug_assertions))]
             {
@@ -40,7 +41,7 @@ pub fn run() {
         })
         .on_window_event(|app_handle, event| {
             #[cfg(debug_assertions)]
-            let _ = app_handle; 
+            let _ = app_handle;
 
             match event {
                 WindowEvent::CloseRequested { api, .. } => {
@@ -50,7 +51,7 @@ pub fn run() {
                     #[cfg(not(debug_assertions))]
                     {
                         println!("Window close requested. Attempting to kill sidecar...");
-                        api.prevent_close(); 
+                        api.prevent_close();
                         let state: State<ManagedChildProcess> = app_handle.state();
                         let mut child_lock = state.inner().0.lock().unwrap();
                         if let Some(mut child_process) = child_lock.take() {

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import items
+from .routers import drone, websockets
 
 app = FastAPI()
 
@@ -11,14 +11,5 @@ app.add_middleware(
     allow_methods=["POST", "GET"],
     allow_headers=["Content-Type"],
 )
-app.include_router(items.router)
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/api/greet/{name}")
-def greet(name: str):
-    return {"message": f"Hello, {name}!"}
+app.include_router(drone.router)
+app.include_router(websockets.router)

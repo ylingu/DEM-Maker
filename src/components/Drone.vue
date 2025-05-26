@@ -20,6 +20,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, h, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
+import { fetch } from '@tauri-apps/plugin-http';
+import WebSocket from '@tauri-apps/plugin-websocket';
 
 const emit = defineEmits(['updateStatus'])
 
@@ -29,6 +31,7 @@ const connecting = ref(false);
 const connectionStatus = ref('未连接无人机');
 const videoFrameSrc = ref<string | null>(null); // 用于显示通过WebSocket接收的JPEG帧 (base64)
 let videoSocket: WebSocket | null = null;
+let wsUnsubscribe: (() => void) | null = null; // WebSocket监听器取消订阅函数
 
 watch(connectionStatus, (newStatus) => {
     emit('updateStatus', newStatus);
@@ -76,10 +79,9 @@ const connectDrone = async () => {
 
         if (response.ok) {
             isConnected.value = true;
-            const data = await response.json();
-            connectionStatus.value = data.message || '无人机连接成功！';
+            connectionStatus.value = '无人机连接成功！';
             console.log('无人机连接成功');
-            initWebSocket();
+            await initWebSocket();
             await nextTick();
             droneControlRef.value?.focus();
         } else {
@@ -88,7 +90,7 @@ const connectDrone = async () => {
             connectionStatus.value = `连接失败: ${response.status} ${errorData.message || response.statusText}`;
             console.error('连接无人机失败:', errorData.message || response.statusText);
         }
-    } catch (error: any) {
+    } catch (error) {
         isConnected.value = false;
         connectionStatus.value = `连接异常: ${error instanceof Error ? error.message : String(error)}`;
         console.error('连接无人机异常:', error);
@@ -103,7 +105,11 @@ const disconnectDrone = async () => {
     connectionStatus.value = '正在断开连接...';
 
     if (videoSocket) {
-        videoSocket.close();
+        if (wsUnsubscribe) {
+            wsUnsubscribe();
+            wsUnsubscribe = null;
+        }
+        await videoSocket.disconnect().catch(() => {});
         videoSocket = null;
     }
 
@@ -112,8 +118,7 @@ const disconnectDrone = async () => {
             method: 'POST',
         });
         if (response.ok) {
-            const data = await response.json();
-            connectionStatus.value = data.message || '无人机已断开连接。';
+            connectionStatus.value = '无人机已断开连接。';
         } else {
             const errorData = await response.json().catch(() => ({ message: '断开连接请求失败。' }));
             console.error('断开连接失败:', errorData.message || response.statusText);
@@ -133,40 +138,56 @@ const disconnectDrone = async () => {
     }
 }
 
-const initWebSocket = () => {
+const initWebSocket = async () => {
+    // 清理之前的连接
     if (videoSocket) {
-        videoSocket.close();
+        if (wsUnsubscribe) {
+            wsUnsubscribe();
+            wsUnsubscribe = null;
+        }
+        await videoSocket.disconnect().catch(() => {});
+        videoSocket = null;
     }
-    videoSocket = new WebSocket(`${BACKEND_WS_URL}/ws/video`);
-    connectionStatus.value = '正在连接视频流...';
 
-    videoSocket.onopen = () => {
+    try {
+        connectionStatus.value = '正在连接视频流...';
+        console.log('正在建立 WebSocket 连接...');
+        
+        // 使用 Tauri v2 WebSocket API 连接
+        videoSocket = await WebSocket.connect(`${BACKEND_WS_URL}/ws/video`);
         console.log('视频流 WebSocket 已连接');
         connectionStatus.value = '视频流已连接，等待数据...';
-    };
 
-    videoSocket.onmessage = (event) => {
-        videoFrameSrc.value = `data:image/jpeg;base64,${event.data}`;
-        if (isConnected.value && connectionStatus.value !== '视频流传输中') {
-            connectionStatus.value = '视频流传输中';
-        }
-    };
+        // 添加消息监听器
+        wsUnsubscribe = videoSocket.addListener((message) => {
+            switch (message.type) {
+                case 'Text':
+                    // 处理文本消息（base64 编码的图像数据）
+                    videoFrameSrc.value = `data:image/jpeg;base64,${message.data}`;
+                    if (isConnected.value && connectionStatus.value !== '视频流传输中') {
+                        connectionStatus.value = '视频流传输中';
+                    }
+                    break;
+                case 'Close':
+                    // 处理关闭消息
+                    console.log('视频流 WebSocket 已关闭:', message.data);
+                    if (isConnected.value) {
+                        connectionStatus.value = '视频流连接已断开。';
+                    } else {
+                        connectionStatus.value = '视频流已关闭。';
+                    }
+                    videoFrameSrc.value = null;
+                    break;
+                default:
+                    console.log('收到未知类型消息:', message);
+            }
+        });
 
-    videoSocket.onerror = (error) => {
-        console.error('视频流 WebSocket 错误:', error);
+    } catch (error) {
+        console.error('视频流 WebSocket 连接错误:', error);
         connectionStatus.value = '视频流连接错误。请检查后端服务。';
         videoFrameSrc.value = null;
-    };
-
-    videoSocket.onclose = () => {
-        console.log('视频流 WebSocket 已关闭');
-        if (isConnected.value) {
-            connectionStatus.value = '视频流连接已断开。';
-        } else {
-            connectionStatus.value = '视频流已关闭。';
-        }
-        videoFrameSrc.value = null;
-    };
+    }
 }
 
 const handleVideoError = () => {
@@ -190,8 +211,7 @@ const sendDroneCommand = async (command: object) => {
             body: JSON.stringify(command),
         });
         if (response.ok) {
-            const result = await response.json();
-            console.log(`指令发送成功:`, command, result.message);
+            console.log(`指令发送成功:`, command);
         } else {
             const errorData = await response.json().catch(() => ({ message: '指令发送失败，无法解析错误信息。' }));
             console.error(`指令发送失败:`, command, errorData.message || response.statusText);
@@ -264,9 +284,14 @@ onMounted(() => {
     }
 });
 
-onUnmounted(() => {
+onUnmounted(async () => {
     if (videoSocket) {
-        videoSocket.close();
+        if (wsUnsubscribe) {
+            wsUnsubscribe();
+            wsUnsubscribe = null;
+        }
+        await videoSocket.disconnect().catch(() => {});
+        videoSocket = null;
     }
 });
 

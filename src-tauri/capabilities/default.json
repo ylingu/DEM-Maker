@@ -16,6 +16,7 @@
         }
       ]
     },
-    "log:default"
+    "log:default",
+    "websocket:default"
   ]
 }
