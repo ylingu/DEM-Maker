@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from ..dependencies import get_drone_service
-from ..services.drone_service import DroneCommand, DroneService
+from ..services import DroneCommand, DroneService
 
 router = APIRouter(
     prefix="/api/drone",

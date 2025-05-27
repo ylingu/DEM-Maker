@@ -1,5 +1,4 @@
 import asyncio
-import base64
 
 import cv2
 from fastapi import WebSocket
@@ -33,9 +32,8 @@ class StreamService:
                 if self.record_service.is_recording:
                     self.record_service.record_frame(frame)
                 _, buffer = cv2.imencode(".jpg", frame)
-                frame_data = base64.b64encode(buffer).decode("utf-8")
                 try:
-                    await self.websocket.send_text(frame_data)
+                    await self.websocket.send_bytes(buffer.tobytes())
                 except Exception:
                     self.is_streaming = False
                     break

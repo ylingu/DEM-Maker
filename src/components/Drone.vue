@@ -22,6 +22,7 @@ import { ref, onMounted, onUnmounted, nextTick, h, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { fetch } from '@tauri-apps/plugin-http';
 import WebSocket from '@tauri-apps/plugin-websocket';
+import { BACKEND_API_URL, BACKEND_WS_URL } from '../config/api';
 
 const emit = defineEmits(['updateStatus'])
 
@@ -36,10 +37,6 @@ let wsUnsubscribe: (() => void) | null = null; // WebSocket监听器取消订阅
 watch(connectionStatus, (newStatus) => {
     emit('updateStatus', newStatus);
 });
-
-const BACKEND_API_URL = 'http://localhost:8000'; // 后端地址
-const BACKEND_WS_URL = 'ws://localhost:8000';   // 后端WebSocket地址
-
 
 let keyState: { [key: string]: boolean } = {};
 
@@ -109,7 +106,7 @@ const disconnectDrone = async () => {
             wsUnsubscribe();
             wsUnsubscribe = null;
         }
-        await videoSocket.disconnect().catch(() => {});
+        await videoSocket.disconnect().catch(() => { });
         videoSocket = null;
     }
 
@@ -130,6 +127,11 @@ const disconnectDrone = async () => {
     } finally {
         isConnected.value = false;
         connecting.value = false;
+
+        // 清理blob URL以防内存泄漏
+        if (videoFrameSrc.value && videoFrameSrc.value.startsWith('blob:')) {
+            URL.revokeObjectURL(videoFrameSrc.value);
+        }
         videoFrameSrc.value = null;
         keyState = {};
         if (!isConnected.value) { // 确保在最终断开后更新状态
@@ -145,25 +147,32 @@ const initWebSocket = async () => {
             wsUnsubscribe();
             wsUnsubscribe = null;
         }
-        await videoSocket.disconnect().catch(() => {});
+        await videoSocket.disconnect().catch(() => { });
         videoSocket = null;
     }
 
     try {
         connectionStatus.value = '正在连接视频流...';
         console.log('正在建立 WebSocket 连接...');
-        
+
         // 使用 Tauri v2 WebSocket API 连接
         videoSocket = await WebSocket.connect(`${BACKEND_WS_URL}/ws/video`);
         console.log('视频流 WebSocket 已连接');
-        connectionStatus.value = '视频流已连接，等待数据...';
-
-        // 添加消息监听器
+        connectionStatus.value = '视频流已连接，等待数据...';        // 添加消息监听器
         wsUnsubscribe = videoSocket.addListener((message) => {
             switch (message.type) {
-                case 'Text':
-                    // 处理文本消息（base64 编码的图像数据）
-                    videoFrameSrc.value = `data:image/jpeg;base64,${message.data}`;
+                case 'Binary':
+                    // 处理二进制数据
+                    const uint8Array = new Uint8Array(message.data);
+                    const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+                    const imageUrl = URL.createObjectURL(blob);
+
+                    // 释放之前的URL以防内存泄漏
+                    if (videoFrameSrc.value && videoFrameSrc.value.startsWith('blob:')) {
+                        URL.revokeObjectURL(videoFrameSrc.value);
+                    }
+
+                    videoFrameSrc.value = imageUrl;
                     if (isConnected.value && connectionStatus.value !== '视频流传输中') {
                         connectionStatus.value = '视频流传输中';
                     }
@@ -175,6 +184,11 @@ const initWebSocket = async () => {
                         connectionStatus.value = '视频流连接已断开。';
                     } else {
                         connectionStatus.value = '视频流已关闭。';
+                    }
+
+                    // 清理blob URL
+                    if (videoFrameSrc.value && videoFrameSrc.value.startsWith('blob:')) {
+                        URL.revokeObjectURL(videoFrameSrc.value);
                     }
                     videoFrameSrc.value = null;
                     break;
@@ -290,8 +304,13 @@ onUnmounted(async () => {
             wsUnsubscribe();
             wsUnsubscribe = null;
         }
-        await videoSocket.disconnect().catch(() => {});
+        await videoSocket.disconnect().catch(() => { });
         videoSocket = null;
+    }
+
+    // 清理blob URL以防内存泄漏
+    if (videoFrameSrc.value && videoFrameSrc.value.startsWith('blob:')) {
+        URL.revokeObjectURL(videoFrameSrc.value);
     }
 });
 

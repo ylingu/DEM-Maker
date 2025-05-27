@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
 from ..dependencies import get_stream_service
-from ..services.stream_service import StreamService
+from ..services import StreamService
 
 router = APIRouter(prefix="/ws", tags=["websockets"])
 
