@@ -1,12 +1,10 @@
 import rasterio
 import numpy as np
 import os
-import open3d as o3d
 import imageio
 import pyvista as pv
-import argparse
 
-def tif_to_thick_obj(tif_path, obj_path="output_thick.obj", thickness=10.0):
+def save_obj_from_dem(tif_path, obj_path="output_thick.obj", thickness=10.0):
     """
     Convert a DEM GeoTIFF into a 3D OBJ mesh with a flat bottom and side walls.
 
@@ -153,18 +151,3 @@ def tif_to_thick_obj(tif_path, obj_path="output_thick.obj", thickness=10.0):
         for face in faces:
             f.write(f"f {face[0]}/{face[0]} {face[1]}/{face[1]} {face[2]}/{face[2]}\n")
     print(f"OBJ+MTL+PNG saved!")
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Convert DEM GeoTIFF to 3D OBJ mesh with thickness.")
-    parser.add_argument("--tif_path", type=str, default='../output_dem.tif', help="Path to the input DEM GeoTIFF file.")
-    parser.add_argument("--obj_path", type=str, default='../output_thick.obj', help="Path to save the output OBJ file.")
-    parser.add_argument("--thickness", type=float, default=5.0, help="Thickness of the base below the minimum elevation.")
-    args = parser.parse_args()
-
-    tif_to_thick_obj(args.tif_path, args.obj_path, args.thickness)
-
-    mesh = pv.read("../output_thick.obj")
-    texture = pv.read_texture("../output_thick.png")
-    plotter = pv.Plotter()
-    plotter.add_mesh(mesh, texture=texture, show_edges=False)
-    plotter.show()

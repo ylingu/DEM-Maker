@@ -1,5 +1,6 @@
 import numpy as np
 import rasterio
+from rasterio.transform import from_origin
 
 def save_geotiff(elevation, rgb, grid_x, grid_y, out_path="..\output_dem.tif"):
     """
@@ -8,9 +9,6 @@ def save_geotiff(elevation, rgb, grid_x, grid_y, out_path="..\output_dem.tif"):
     grid_x, grid_y: 网格坐标
     out_path: 输出路径
     """
-    from rasterio.transform import from_origin
-    import numpy as np
-
     height, width = elevation.shape
     xres = (grid_x.max() - grid_x.min()) / (width - 1)
     yres = (grid_y.max() - grid_y.min()) / (height - 1)

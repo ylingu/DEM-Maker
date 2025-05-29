@@ -3,10 +3,9 @@ from scipy.spatial import cKDTree
 from joblib import Parallel, delayed
 from pykrige.ok import OrdinaryKriging
 from tqdm import tqdm
-from tqdm.contrib.concurrent import thread_map
 from multiprocessing import Pool
 
-# 局部 KNN 克里金插值
+# 克里金插值
 def _krige_single_row(i, grid_x_row, grid_y_row, tree, points, k_neighbors):
     row_vals = []
     for j, (gx, gy) in enumerate(zip(grid_x_row, grid_y_row)):
@@ -43,7 +42,7 @@ def kriging_interpolation(points, grid_x, grid_y, k_neighbors=50, n_jobs=-1):
         dem[i, :] = row_vals
     return dem
 
-# 局部 IDW 插值
+# IDW 插值
 def process_row_parallel(args):
     i, grid_x_row, grid_y_row, points, k, power, min_points, tree = args
     row_result = np.full(len(grid_x_row), np.nan)
@@ -60,7 +59,7 @@ def process_row_parallel(args):
         row_result[j] = np.sum(weights * zs) / np.sum(weights)
     return i, row_result
 
-def idw_interpolation(points, grid_x, grid_y, power=2, k=10, min_points=3, n_jobs=16):
+def idw_interpolation(points, grid_x, grid_y, power=2, k=10, min_points=3, n_jobs=-1):
     print("IDW interpolation (multiprocessing)...")
     dem = np.full(grid_x.shape, np.nan)
     rows, cols = grid_x.shape
@@ -79,21 +78,6 @@ def idw_interpolation(points, grid_x, grid_y, power=2, k=10, min_points=3, n_job
 
     return dem
 
-
-# IDW颜色插值
-def _interpolate_one(idx, flat_grid, tree, points, colors, radius, power, min_points, grid_shape):
-    neighbors = tree.query_ball_point(flat_grid[idx], r=radius)
-    if len(neighbors) < min_points:
-        return idx, None
-    gx, gy = flat_grid[idx]
-    neighbor_pts = points[neighbors]
-    neighbor_cols = colors[neighbors]
-    dists = np.sqrt((neighbor_pts[:, 0] - gx) ** 2 + (neighbor_pts[:, 1] - gy) ** 2)
-    dists[dists == 0] = 1e-12
-    weights = 1 / (dists ** power)
-    weighted_color = np.sum(weights[:, None] * neighbor_cols, axis=0) / np.sum(weights)
-    return idx, weighted_color
-
 # 并行最近邻颜色插值
 def _query_nearest(idx, flat_grid, tree, colors):
     dist, nearest_idx = tree.query(flat_grid[idx])
@@ -101,7 +85,6 @@ def _query_nearest(idx, flat_grid, tree, colors):
 
 def nearest_color_interpolation(points, colors, grid_x, grid_y, n_jobs=-1):
     """
-    并行版本的最近邻颜色插值，带进度条。
     points: (N, 2)
     colors: (N, 3) float32 in 0~1 or uint8 in 0~255
     grid_x, grid_y: meshgrid

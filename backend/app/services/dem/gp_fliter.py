@@ -7,7 +7,7 @@ import laspy
 import os
 from tqdm import tqdm
 
-def filter_pointcloud(pointcloud, colors=None):
+def groundPoints_fliter(pointcloud, colors=None):
     """
     使用PDAL的progressive morphological filter提取地面点，
     并对地面点缺陷区域进行补齐（用最近邻z值填补）。
