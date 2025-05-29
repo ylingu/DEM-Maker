@@ -94,62 +94,6 @@ def _interpolate_one(idx, flat_grid, tree, points, colors, radius, power, min_po
     weighted_color = np.sum(weights[:, None] * neighbor_cols, axis=0) / np.sum(weights)
     return idx, weighted_color
 
-def idw_color_interpolation(points, colors, grid_x, grid_y, power=2, radius=2.0, min_points=3, n_jobs=-1):
-    """
-    超快IDW颜色插值，支持多线程并行。
-    points: (N, 3) array
-    colors: (N, 3) array, 推荐float32且归一化到0~1
-    grid_x, grid_y: 网格
-    power: 权重幂次
-    radius: 搜索半径
-    min_points: 最小邻居数
-    n_jobs: 并行数（-1=全部CPU）
-    """
-    print("Parallel IDW color interpolation...")
-
-    # 归一化颜色到0~1，避免溢出和偏色
-    if colors.dtype == np.uint8:
-        colors = colors.astype(np.float32) / 255.0
-    else:
-        colors = colors.astype(np.float32)
-        if colors.max() > 1.1:  # 可能是0~255
-            colors = colors / 255.0
-
-    color_grid = np.full(grid_x.shape + (3,), np.nan, dtype=np.float32)
-    tree = cKDTree(points[:, :2])
-    flat_grid = np.column_stack((grid_x.ravel(), grid_y.ravel()))
-    grid_shape = grid_x.shape
-
-    def _interpolate_one(idx):
-        neighbors = tree.query_ball_point(flat_grid[idx], r=radius)
-        if len(neighbors) < min_points:
-            return idx, None
-        gx, gy = flat_grid[idx]
-        neighbor_pts = points[neighbors]
-        neighbor_cols = colors[neighbors]
-        dists = np.sqrt((neighbor_pts[:, 0] - gx) ** 2 + (neighbor_pts[:, 1] - gy) ** 2)
-        dists[dists == 0] = 1e-12
-        weights = 1 / (dists ** power)
-        if np.sum(weights) == 0:
-            return idx, None
-        weighted_color = np.sum(weights[:, None] * neighbor_cols, axis=0) / np.sum(weights)
-        return idx, weighted_color
-
-    results = Parallel(n_jobs=n_jobs, prefer="threads", verbose=0)(
-        delayed(_interpolate_one)(idx)
-        for idx in tqdm(range(flat_grid.shape[0]), desc="Color IDW", ncols=80)
-    )
-
-    for idx, weighted_color in results:
-        if weighted_color is not None:
-            i, j = np.unravel_index(idx, grid_shape)
-            color_grid[i, j] = weighted_color
-
-    # 插值后反归一化回uint8
-    color_grid = np.clip(color_grid * 255, 0, 255)
-    color_grid = np.nan_to_num(color_grid, nan=0).astype(np.uint8)
-    return color_grid
-
 # 并行最近邻颜色插值
 def _query_nearest(idx, flat_grid, tree, colors):
     dist, nearest_idx = tree.query(flat_grid[idx])

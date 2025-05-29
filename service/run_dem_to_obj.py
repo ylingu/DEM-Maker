@@ -31,7 +31,7 @@ def tif_to_thick_obj(tif_path, obj_path="output_thick.obj", thickness=10.0):
     xs = np.arange(W)
     ys = np.arange(H)
     gx, gy = np.meshgrid(xs, ys)
-    # 直接用 transform 变换
+
     lon, lat = rasterio.transform.xy(transform, gy, gx, offset='center')
     lon = np.array(lon).reshape(H, W)
     lat = np.array(lat).reshape(H, W)
@@ -126,14 +126,14 @@ def tif_to_thick_obj(tif_path, obj_path="output_thick.obj", thickness=10.0):
     mtl_path = obj_path.replace('.obj', '.mtl')
     # 保存纹理贴图（需上下翻转，保证与UV一致）
     if rgb is not None:
-        imageio.imwrite(texture_path, np.flipud(rgb))  # 上下翻转
+        imageio.imwrite(texture_path, np.flipud(rgb))
 
     # 生成UV坐标（左上为(0,0)，右下为(1,1)）
     uvs = []
     for i in range(H):
         for j in range(W):
             u = j / (W - 1)
-            v = i / (H - 1)  # 注意这里v不再1-i/(H-1)，而是i/(H-1)
+            v = i / (H - 1)
             uvs.append((u, v))
     uvs = uvs * 2  # 顶面和底面都用
 
@@ -151,7 +151,6 @@ def tif_to_thick_obj(tif_path, obj_path="output_thick.obj", thickness=10.0):
             f.write(f"vt {u} {v}\n")
         f.write("usemtl material_0\n")
         for face in faces:
-            # OBJ索引从1开始，顶点和UV索引一致
             f.write(f"f {face[0]}/{face[0]} {face[1]}/{face[1]} {face[2]}/{face[2]}\n")
     print(f"OBJ+MTL+PNG saved!")
 

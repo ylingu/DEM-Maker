@@ -10,8 +10,8 @@ from scipy.spatial import cKDTree
 from rasterio.transform import from_origin
 
 from groundPoint_fliter import filter_pointcloud
-from interpolator import kriging_interpolation, idw_interpolation, idw_color_interpolation, nearest_color_interpolation
-from dem_save import save_geotiff
+from interpolator import kriging_interpolation, idw_interpolation, nearest_color_interpolation
+from service.src.dem_saver import save_geotiff
 
 # 读取点云数据（支持.las, .laz, .ply, .pcd）
 def read_pointcloud(file_path):
@@ -82,7 +82,6 @@ def demGenerate(file_path, ground_fliter=None, colors_data=None, method="idw", g
     
     # 颜色插值
     if ground_colors is not None:
-        # color_grid = idw_color_interpolation(ground_points, ground_colors, grid_x, grid_y, n_jobs=8)
         color_grid = nearest_color_interpolation(ground_points, ground_colors, grid_x, grid_y, n_jobs=8)
     else:
         color_grid = None
