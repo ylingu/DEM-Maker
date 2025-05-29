@@ -10,7 +10,6 @@ import open3d as o3d
 o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Error)
 
 from .dem.interpolator import idw_interpolation, kriging_interpolation, nearest_color_interpolation
-from .dem.gp_fliter import groundPoints_fliter
 from .dem.saver import save_geotiff
 from .dem.evaluator import load_dem, compute_rmse
 from .dem.obj_exporter import save_obj_from_dem
@@ -19,13 +18,11 @@ class DemService:
     def __init__(
         self,
         pcd_path: str = None,
-        ground_fliter: bool = None,
         colors_data: bool = True,
         method: Literal["idw", "kriging"] = "idw",
         grid_size: int = 500
     ):
         self.pcd_path = pcd_path
-        self.ground_fliter = ground_fliter
         self.colors_data = colors_data
         self.method = method
         self.grid_size = grid_size
@@ -68,7 +65,6 @@ class DemService:
     def generate_dem(
         self, 
         pcd_path: str,
-        ground_fliter: bool = None,
         colors_data: bool = True,
         method: Literal["idw", "kriging"] = "idw",
         grid_size: int = 500
@@ -81,12 +77,9 @@ class DemService:
             points, _ = self.read_pointcloud(pcd_path)
             colors = None
 
-        # 地面点提取
-        if ground_fliter is None:
-            ground_points = points
-            ground_colors = colors
-        else:
-            ground_points, ground_colors = groundPoints_fliter(points, colors)
+        # 不进行地面点筛选
+        ground_points = points
+        ground_colors = colors
 
         # 网格大小设置
         min_x, max_x = ground_points[:, 0].min(), ground_points[:, 0].max()

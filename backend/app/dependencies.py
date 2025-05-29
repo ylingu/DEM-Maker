@@ -1,4 +1,4 @@
-from .services import DroneService, RecordService, StreamService
+from .services import DroneService, RecordService, StreamService, DemService
 
 _record_service = RecordService()
 _drone_service: DroneService | None = None
