@@ -2,9 +2,6 @@ import laspy
 import numpy as np
 import os
 import pyvista as pv
-from tqdm import tqdm
-from scipy.spatial import cKDTree
-from rasterio.transform import from_origin
 from typing import Literal
 import open3d as o3d
 o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Error)
@@ -15,44 +12,36 @@ from .dem.evaluator import load_dem, compute_rmse
 from .dem.obj_exporter import save_obj_from_dem
 
 class DemService:
-    def __init__(
-        self,
-        pcd_path: str = None,
-        colors_data: bool = True,
-        method: Literal["idw", "kriging"] = "idw",
-        grid_size: int = 500
-    ):
-        self.pcd_path = pcd_path
-        self.colors_data = colors_data
-        self.method = method
-        self.grid_size = grid_size
-        self.dem = None
-        self.grid_x = None
-        self.grid_y = None
-        self.color_grid = None
-        self.obj_path = None
-
+    def __init__(self):
+        self.pcd_path: str = None
+        self.ground_fliter: bool = None
+        self.colors_data: bool = True
+        self.method: str = "idw"  # idw or kriging
+        self.grid_size: int = 500
+        self.dem: np.ndarray = None
+        self.grid_x: np.ndarray = None
+        self.grid_y: np.ndarray = None
+        self.color_grid: np.ndarray = None
+        self.obj_path: str = None
 
     def read_pointcloud(self, pcd_path):
         print("Reading point cloud...")
         ext = os.path.splitext(pcd_path)[1].lower()
-        with tqdm(total=1, desc="Reading", ncols=80) as pbar:
-            if ext in ['.las', '.laz']:
-                with laspy.open(pcd_path) as f:
-                    pointcloud = f.read()
-                xyz = np.vstack((pointcloud.x, pointcloud.y, pointcloud.z)).T
-                if hasattr(pointcloud, 'red') and hasattr(pointcloud, 'green') and hasattr(pointcloud, 'blue'):
-                    rgb = np.vstack((pointcloud.red, pointcloud.green, pointcloud.blue)).T
-                    rgb = rgb / 65535.0 if rgb.max() > 255 else rgb / 255.0
-                else:
-                    rgb = None
-            elif ext in ['.ply', '.pcd']:
-                pcd = o3d.io.read_point_cloud(pcd_path)
-                xyz = np.asarray(pcd.points)
-                rgb = np.asarray(pcd.colors) if len(pcd.colors) > 0 else None
+        if ext in ['.las', '.laz']:
+            with laspy.open(pcd_path) as f:
+                pointcloud = f.read()
+            xyz = np.vstack((pointcloud.x, pointcloud.y, pointcloud.z)).T
+            if hasattr(pointcloud, 'red') and hasattr(pointcloud, 'green') and hasattr(pointcloud, 'blue'):
+                rgb = np.vstack((pointcloud.red, pointcloud.green, pointcloud.blue)).T
+                rgb = rgb / 65535.0 if rgb.max() > 255 else rgb / 255.0
             else:
-                raise ValueError(f"Unsupported file format: {ext}")
-            pbar.update(1)
+                rgb = None
+        elif ext in ['.ply', '.pcd']:
+            pcd = o3d.io.read_point_cloud(pcd_path)
+            xyz = np.asarray(pcd.points)
+            rgb = np.asarray(pcd.colors) if len(pcd.colors) > 0 else None
+        else:
+            raise ValueError(f"Unsupported file format: {ext}")
         return xyz, rgb
 
     def visualize_pointcloud(self, points, colors=None, title="Point Cloud"):

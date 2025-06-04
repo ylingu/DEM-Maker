@@ -2,7 +2,6 @@ import numpy as np
 from scipy.spatial import cKDTree
 from joblib import Parallel, delayed
 from pykrige.ok import OrdinaryKriging
-from tqdm import tqdm
 from multiprocessing import Pool
 
 # 克里金插值
@@ -33,10 +32,9 @@ def kriging_interpolation(points, grid_x, grid_y, k_neighbors=50, n_jobs=-1):
     tree = cKDTree(points[:, :2])
     rows = grid_x.shape[0]
 
-    # 使用tqdm进度条
     results = Parallel(n_jobs=n_jobs, prefer="threads")(
         delayed(_krige_single_row)(i, grid_x[i], grid_y[i], tree, points, k_neighbors)
-        for i in tqdm(range(rows), desc="Kriging插值进度")
+        for i in range(rows)
     )
     for i, row_vals in results:
         dem[i, :] = row_vals
@@ -72,8 +70,7 @@ def idw_interpolation(points, grid_x, grid_y, power=2, k=10, min_points=3, n_job
     tasks = [(i, grid_x[i, :], grid_y[i, :], points, k, power, min_points, tree) for i in range(rows)]
 
     with Pool(processes=n_jobs) as pool:
-        # tqdm包装imap_unordered，边取边显示进度
-        for i, row_result in tqdm(pool.imap_unordered(process_row_parallel, tasks), total=rows, desc="Interpolating", ncols=80):
+        for i, row_result in pool.imap_unordered(process_row_parallel, tasks):
             dem[i, :] = row_result
 
     return dem
@@ -107,7 +104,7 @@ def nearest_color_interpolation(points, colors, grid_x, grid_y, n_jobs=-1):
 
     results = Parallel(n_jobs=n_jobs, prefer="threads", verbose=0)(
         delayed(_query_nearest)(idx, flat_grid, tree, colors)
-        for idx in tqdm(range(flat_grid.shape[0]), desc="Nearest NN", ncols=80)
+        for idx in range(flat_grid.shape[0])
     )
 
     for idx, color in results:

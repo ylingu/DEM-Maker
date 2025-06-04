@@ -2,7 +2,6 @@ import rasterio
 import numpy as np
 import os
 import imageio
-import pyvista as pv
 
 def save_obj_from_dem(tif_path, obj_path="output_thick.obj", thickness=10.0):
     """
