@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import drone, websockets
+from .routers import drone, websockets, dem_router
 
 app = FastAPI()
 
@@ -17,3 +17,4 @@ app.add_middleware(
 )
 app.include_router(drone.router)
 app.include_router(websockets.router)
+app.include_router(dem_router.router)
