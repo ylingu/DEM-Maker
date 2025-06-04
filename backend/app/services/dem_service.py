@@ -20,7 +20,6 @@ class DemService:
         self.grid_x: np.ndarray = None
         self.grid_y: np.ndarray = None
         self.color_grid: np.ndarray = None
-        self.obj_path: str = None
 
     def read_pointcloud(self, pcd_path):
         print("Reading point cloud...")
