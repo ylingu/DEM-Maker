@@ -1,7 +1,6 @@
 import laspy
 import numpy as np
 import os
-import pyvista as pv
 from typing import Literal
 import open3d as o3d
 o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Error)
@@ -9,7 +8,6 @@ o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Error)
 from .dem.interpolator import idw_interpolation, kriging_interpolation, nearest_color_interpolation
 from .dem.saver import save_geotiff
 from .dem.evaluator import load_dem, compute_rmse
-from .dem.obj_exporter import save_obj_from_dem
 
 class DemService:
     def __init__(self):
@@ -132,24 +130,3 @@ class DemService:
         rmse = compute_rmse(aligned_pred, aligned_gt)
         print(f"RMSE between generated DEM and ground truth DEM: {rmse:.4f}")
         return rmse
-
-    def export_obj(
-        self, 
-        dem: np.ndarray, 
-        obj_path: str
-    ):
-        # 将 DEM 导出为 3D OBJ 模型
-        save_obj_from_dem(dem, obj_path)
-        
-    def visualize_obj(
-        self, 
-        obj_path: str
-    ):
-        # 可视化 OBJ 模型
-        if not os.path.exists(obj_path):
-            raise FileNotFoundError(f"OBJ file not found: {obj_path}")
-        mesh = pv.read(obj_path)
-        texture = pv.read_texture(obj_path.replace('.obj', '.png'))
-        plotter = pv.Plotter()
-        plotter.add_mesh(mesh, texture=texture, show_edges=False)
-        plotter.show()
