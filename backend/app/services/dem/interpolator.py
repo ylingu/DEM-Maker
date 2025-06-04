@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from scipy.spatial import cKDTree
 from joblib import Parallel, delayed
 from pykrige.ok import OrdinaryKriging
@@ -26,7 +27,7 @@ def _krige_single_row(i, grid_x_row, grid_y_row, tree, points, k_neighbors):
     return i, row_vals
 
 #_local_parallel
-def kriging_interpolation(points, grid_x, grid_y, k_neighbors=50, n_jobs=-1):
+def kriging_interpolation(points, grid_x, grid_y, k_neighbors=50, n_jobs=os.cpu_count()):
     print("Parallel Local Kriging interpolation...")
     dem = np.full(grid_x.shape, np.nan)
     tree = cKDTree(points[:, :2])
@@ -57,7 +58,7 @@ def process_row_parallel(args):
         row_result[j] = np.sum(weights * zs) / np.sum(weights)
     return i, row_result
 
-def idw_interpolation(points, grid_x, grid_y, power=2, k=10, min_points=3, n_jobs=-1):
+def idw_interpolation(points, grid_x, grid_y, power=2, k=10, min_points=3, n_jobs=os.cpu_count()):
     print("IDW interpolation (multiprocessing)...")
     dem = np.full(grid_x.shape, np.nan)
     rows, cols = grid_x.shape
@@ -80,7 +81,7 @@ def _query_nearest(idx, flat_grid, tree, colors):
     dist, nearest_idx = tree.query(flat_grid[idx])
     return idx, colors[nearest_idx]
 
-def nearest_color_interpolation(points, colors, grid_x, grid_y, n_jobs=-1):
+def nearest_color_interpolation(points, colors, grid_x, grid_y, n_jobs=os.cpu_count()):
     """
     points: (N, 2)
     colors: (N, 3) float32 in 0~1 or uint8 in 0~255
