@@ -1,8 +1,9 @@
-from .services import DroneService, RecordService, StreamService
+from .services import DroneService, PlyService, RecordService, StreamService
 
 _record_service = RecordService()
 _drone_service: DroneService | None = None
 _stream_service: StreamService | None = None
+_ply_service = PlyService()
 
 def get_drone_service():
     global _drone_service  # noqa: PLW0603
