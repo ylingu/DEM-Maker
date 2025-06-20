@@ -7,14 +7,13 @@ o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Error)
 
 from .dem.interpolator import idw_interpolation, kriging_interpolation, nearest_color_interpolation
 from .dem.saver import save_geotiff
-from .dem.evaluator import load_dem, compute_rmse
 
 class DemService:
     def __init__(self):
         self.pcd_path: str = None
         self.ground_fliter: bool = None
         self.colors_data: bool = True
-        self.method: str = "idw"  # idw or kriging
+        self.method: Literal["idw", "kriging"] = "idw"  # idw or kriging
         self.grid_size: int = 500
         self.dem: np.ndarray = None
         self.grid_x: np.ndarray = None
@@ -22,7 +21,7 @@ class DemService:
         self.color_grid: np.ndarray = None
 
     def read_pointcloud(self, pcd_path):
-        print("Reading point cloud...")
+        # print("Reading point cloud...")
         ext = os.path.splitext(pcd_path)[1].lower()
         if ext in ['.las', '.laz']:
             with laspy.open(pcd_path) as f:
@@ -77,12 +76,8 @@ class DemService:
 
         if method == "idw":
             dem = idw_interpolation(ground_points, grid_x, grid_y)
-            print("DEM generated using IDW.")
         elif method == "kriging":
             dem = kriging_interpolation(ground_points, grid_x, grid_y)
-            print("DEM generated using Kriging.")
-        else:
-            raise ValueError("Invalid interpolation method. Choose 'idw' or 'kriging'.")
         
         # 颜色插值
         if ground_colors is not None:
@@ -118,14 +113,3 @@ class DemService:
     ):
         # 保存 DEM 为 GeoTIFF 格式
         save_geotiff(dem, color_grid, grid_x, grid_y, output_path)
-
-    def evaluate(
-        self, 
-        dem: np.ndarray, 
-        ground_truth: np.ndarray
-    ) -> dict:
-        # 对比生成的DEM与参考DEM，输出评估指标（RMSE）
-        aligned_pred, aligned_gt = load_dem(dem, ground_truth)
-        rmse = compute_rmse(aligned_pred, aligned_gt)
-        print(f"RMSE between generated DEM and ground truth DEM: {rmse:.4f}")
-        return rmse

@@ -4,6 +4,7 @@ from app.services.dem_service import DemService
 import tempfile
 import shutil
 import os
+from typing import Literal
 
 router = APIRouter()
 
@@ -14,7 +15,7 @@ def remove_file(path: str):
 async def generate_dem(
     file: UploadFile = File(...),
     colors_data: bool = Form(True),
-    method: str = Form("idw"),
+    method: Literal["idw", "kriging"] = Form("idw"),
     grid_size: int = Form(500),
     background_tasks: BackgroundTasks = None
 ):

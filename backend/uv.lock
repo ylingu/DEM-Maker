@@ -94,7 +94,6 @@ dependencies = [
     { name = "joblib" },
     { name = "laspy" },
     { name = "open3d" },
-    { name = "pykrige" },
     { name = "pyvista" },
     { name = "rasterio" },
     { name = "scipy" },
@@ -113,7 +112,6 @@ requires-dist = [
     { name = "joblib", specifier = ">=1.4.2" },
     { name = "laspy", specifier = ">=2.5.4" },
     { name = "open3d", specifier = ">=0.19.0" },
-    { name = "pykrige", specifier = ">=1.7.2" },
     { name = "pyvista", specifier = ">=0.45.0" },
     { name = "rasterio", specifier = ">=1.4.3" },
     { name = "scipy", specifier = ">=1.15.2" },
@@ -1111,22 +1109,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7c/2d/c3338d48ea6cc0feb8446d8e6937e1408088a72a39937982cc6111d17f84/pygments-2.19.1.tar.gz", hash = "sha256:61c16d2a8576dc0649d9f39e089b5f02bcd27fba10d8fb4dcc28173f7a45151f", size = 4968581, upload-time = "2025-01-06T17:26:30.443Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/0b/9fcc47d19c48b59121088dd6da2488a49d5f72dacf8262e2790a1d2c7d15/pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c", size = 1225293, upload-time = "2025-01-06T17:26:25.553Z" },
-]
-
-[[package]]
-name = "pykrige"
-version = "1.7.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-    { name = "scipy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ea/00/d815833441d8c52bf4a6930952e77d3de77d0bf67b3202ccc12dabdae279/pykrige-1.7.2.tar.gz", hash = "sha256:25b45a4173714c0b62098d19019404cb3978fa8bd8abae9ba55a272a53979e35", size = 618688, upload-time = "2024-05-27T22:29:22.519Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/57/a0161ed40ca24be480a02067410a849317d38d736fa3894190c0dc4280ab/PyKrige-1.7.2-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:91cd18ec9044d28fe5b397e5788b712b7f36c0c116de22ae7d56952f83b253ca", size = 227348, upload-time = "2024-05-27T22:29:02.851Z" },
-    { url = "https://files.pythonhosted.org/packages/2c/f8/a4d6909126020c4193051c97a86b5a7bd6e312f96c88f85794a4b69ab8ce/PyKrige-1.7.2-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:2bdc676f5d3ddad2552dbf1e6d9699cc186039379dd0a84a5c9c2c27cbf9dc53", size = 214825, upload-time = "2024-05-27T22:29:04.834Z" },
-    { url = "https://files.pythonhosted.org/packages/01/39/214da796fd63f74bfe78be57cda7d1ab0305a0b2345974ce0d65955f219c/PyKrige-1.7.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a6e15c999435de303f76413b41d6ba4d271e12d96a93ac2f1acd4d80d526fab2", size = 961681, upload-time = "2024-05-27T22:29:06.854Z" },
-    { url = "https://files.pythonhosted.org/packages/e5/f1/df7322867f2279ce82a79211196c1dfd62c230bd62a889e0016ea4f6c7cf/PyKrige-1.7.2-cp312-cp312-win_amd64.whl", hash = "sha256:e0138c1dfdbbaeb76df20a304f90deeccec56951518ceae81e34bfbbb49649f5", size = 205914, upload-time = "2024-05-27T22:29:08.626Z" },
 ]
 
 [[package]]

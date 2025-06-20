@@ -28,7 +28,7 @@ def _krige_single_row(i, grid_x_row, grid_y_row, tree, points, k_neighbors):
 
 #_local_parallel
 def kriging_interpolation(points, grid_x, grid_y, k_neighbors=50, n_jobs=os.cpu_count()):
-    print("Parallel Local Kriging interpolation...")
+    # print("Parallel Local Kriging interpolation...")
     dem = np.full(grid_x.shape, np.nan)
     tree = cKDTree(points[:, :2])
     rows = grid_x.shape[0]
@@ -59,7 +59,7 @@ def process_row_parallel(args):
     return i, row_result
 
 def idw_interpolation(points, grid_x, grid_y, power=2, k=10, min_points=3, n_jobs=os.cpu_count()):
-    print("IDW interpolation (multiprocessing)...")
+    # print("IDW interpolation (multiprocessing)...")
     dem = np.full(grid_x.shape, np.nan)
     rows, cols = grid_x.shape
 
@@ -87,7 +87,7 @@ def nearest_color_interpolation(points, colors, grid_x, grid_y, n_jobs=os.cpu_co
     colors: (N, 3) float32 in 0~1 or uint8 in 0~255
     grid_x, grid_y: meshgrid
     """
-    print("Parallel Nearest Neighbor color interpolation...")
+    # print("Parallel Nearest Neighbor color interpolation...")
 
     # 归一化颜色到0~1
     if colors.dtype == np.uint8:

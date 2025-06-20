@@ -41,4 +41,4 @@ def save_geotiff(elevation, rgb, grid_x, grid_y, out_path="..\output_dem.tif"):
             dst.write(rgb[0], 2)
             dst.write(rgb[1], 3)
             dst.write(rgb[2], 4)
-    print(f"GeoTIFF saved at: {out_path}")
+    # print(f"GeoTIFF saved at: {out_path}")

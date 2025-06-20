@@ -14,7 +14,6 @@ dependencies = [
     "joblib>=1.4.2",
     "rasterio>=1.4.3",
     "imageio>=2.37.0",
-    "pykrige>=1.7.2"
 ]
 
 [dependency-groups]
