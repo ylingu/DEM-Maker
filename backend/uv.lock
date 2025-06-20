@@ -81,6 +81,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "djitellopy" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "pycolmap" },
     { name = "rasterio" },
 ]
 
@@ -93,6 +94,7 @@ dev = [
 requires-dist = [
     { name = "djitellopy", specifier = ">=2.5.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.12" },
+    { name = "pycolmap", specifier = ">=3.11.1" },
     { name = "rasterio", specifier = ">=1.4.3" },
 ]
 
@@ -518,6 +520,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/92/1ca0c3f09233bd7decf8f7105a1c4e3162fb9142128c74adad0fb361b7eb/pillow-11.2.1-cp313-cp313t-win32.whl", hash = "sha256:e0b55f27f584ed623221cfe995c912c61606be8513bfa0e07d2c674b4516d9dd", size = 2335774, upload-time = "2025-04-12T17:49:04.889Z" },
     { url = "https://files.pythonhosted.org/packages/a5/ac/77525347cb43b83ae905ffe257bbe2cc6fd23acb9796639a1f56aa59d191/pillow-11.2.1-cp313-cp313t-win_amd64.whl", hash = "sha256:36d6b82164c39ce5482f649b437382c0fb2395eabc1e2b1702a6deb8ad647d6e", size = 2681895, upload-time = "2025-04-12T17:49:06.635Z" },
     { url = "https://files.pythonhosted.org/packages/67/32/32dc030cfa91ca0fc52baebbba2e009bb001122a1daa8b6a79ad830b38d3/pillow-11.2.1-cp313-cp313t-win_arm64.whl", hash = "sha256:225c832a13326e34f212d2072982bb1adb210e0cc0b153e688743018c94a2681", size = 2417234, upload-time = "2025-04-12T17:49:08.399Z" },
+]
+
+[[package]]
+name = "pycolmap"
+version = "3.11.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e7/30/c5c3476a859bd1c22669a6440d1ef8f10f3f16966d265c36878f0141140a/pycolmap-3.11.1-cp312-cp312-macosx_10_15_x86_64.whl", hash = "sha256:994dc06fb94d733897cf696df25f1217f3491f34b3c26354ceee5a5e60f7a22b", size = 9728747, upload-time = "2024-12-06T16:51:06.101Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/76/e21bad4b7dc2ef464b5145328d7a67d2371c95ea46678ee48043e05a92d2/pycolmap-3.11.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:6d3541c671b7e61f5e381ed6a08de522f4f26ada957cecff1f8e7f964f03d3d7", size = 8510505, upload-time = "2024-12-06T16:51:08.303Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/45/783e293e974cfc56816dd87946c7d5ea410c8fdf7e6d04ef4be947e2a2c8/pycolmap-3.11.1-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:14f04f48d13358e9418d71b3a806f1aa39ab0b2a35904907f74142e4964b098b", size = 12534415, upload-time = "2024-12-06T16:51:10.425Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/d4/fe80e9a4d299870af4f3de81857fac74ae5dc8d7773d658d82ecc17e529e/pycolmap-3.11.1-cp312-cp312-win_amd64.whl", hash = "sha256:e023af9e4fb54c5e2dec23ff7410eedfa79d53f5f8eeac31f435cf560a9e4c94", size = 13804497, upload-time = "2024-12-06T16:51:12.784Z" },
 ]
 
 [[package]]
