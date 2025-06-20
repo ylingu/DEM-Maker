@@ -4,7 +4,7 @@ import shutil
 import subprocess
 
 class PlyService:
-    def __init__(self, working_dir):
+    def __init__(self, working_dir='tello'):
         self.working_dir = working_dir
 
         # 配置日志
