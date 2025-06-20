@@ -1,8 +1,9 @@
+from typing import Union
 from .services import DroneService, PlyService, RecordService, StreamService
 
 _record_service = RecordService()
-_drone_service: DroneService | None = None
-_stream_service: StreamService | None = None
+_drone_service: Union[DroneService, None] = None
+_stream_service: Union[StreamService, None] = None
 _ply_service = PlyService()
 
 def get_drone_service():

@@ -279,10 +279,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     
-    if args.input_folder is None:
-        args.input_folder = os.getcwd()  # 使用当前工作目录作为默认输入文件夹
-
-    if not os.path.isdir(args.input_folder):
+    if args.input_folder is None or not os.path.isdir(args.input_folder):
         raise Exception("Invalid input folder")
     
     if not args.output_folder:

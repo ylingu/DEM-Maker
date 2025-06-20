@@ -1,5 +1,5 @@
 import asyncio
-from typing import Literal
+from typing import Literal, Union
 
 from djitellopy import Tello
 from pydantic import BaseModel
@@ -9,7 +9,7 @@ from .record_service import RecordService
 
 class DroneCommand(BaseModel):
     action: Literal["takeoff", "land", "press", "release"]
-    key: Literal["w", "s", "a", "d", "q", "e", " ", "control"] | None = None
+    key: Union[Literal["w", "s", "a", "d", "q", "e", " ", "control"], None] = None
 
 
 class DroneService:
@@ -49,34 +49,32 @@ class DroneService:
             )
 
     def _handle_press(self, key: str):
-        match key:
-            case "w":
-                self.for_back_velocity = self.SPEED
-            case "s":
-                self.for_back_velocity = -self.SPEED
-            case "a":
-                self.left_right_velocity = -self.SPEED
-            case "d":
-                self.left_right_velocity = self.SPEED
-            case "q":
-                self.yaw_velocity = -self.SPEED
-            case "e":
-                self.yaw_velocity = self.SPEED
-            case " ":
-                self.up_down_velocity = self.SPEED
-            case "control":
-                self.up_down_velocity = -self.SPEED
+        if key == "w":
+            self.for_back_velocity = self.SPEED
+        elif key == "s":
+            self.for_back_velocity = -self.SPEED
+        elif key == "a":
+            self.left_right_velocity = -self.SPEED
+        elif key == "d":
+            self.left_right_velocity = self.SPEED
+        elif key == "q":
+            self.yaw_velocity = -self.SPEED
+        elif key == "e":
+            self.yaw_velocity = self.SPEED
+        elif key == " ":
+            self.up_down_velocity = self.SPEED
+        elif key == "control":
+            self.up_down_velocity = -self.SPEED
 
     def _handle_release(self, key: str):
-        match key:
-            case "w" | "s":
-                self.for_back_velocity = 0
-            case "a" | "d":
-                self.left_right_velocity = 0
-            case "q" | "e":
-                self.yaw_velocity = 0
-            case " " | "control":
-                self.up_down_velocity = 0
+        if key in ["w", "s"]:
+            self.for_back_velocity = 0
+        elif key in ["a", "d"]:
+            self.left_right_velocity = 0
+        elif key in ["q", "e"]:
+            self.yaw_velocity = 0
+        elif key in [" ", "control"]:
+            self.up_down_velocity = 0
 
     async def execute_command(self, command: DroneCommand):
         loop = asyncio.get_event_loop()

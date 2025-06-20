@@ -16,6 +16,8 @@ from datasets.mvs import MVSDataset
 from models.net import PatchmatchNet
 from utils import print_args, tensor2numpy, to_cuda
 
+import sys
+
 
 def save_depth(args):
     """Run MVS model to save depth maps"""

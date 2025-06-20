@@ -2,12 +2,17 @@
 name = "backend"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.12"
+requires-python = ">=3.8,<3.12"
 dependencies = [
     "djitellopy>=2.5.0",
     "fastapi[standard]>=0.115.12",
     "pycolmap>=3.11.1",
-    "rasterio>=1.4.3",
+    "rasterio",
+    "plyfile",
+    "tensorboard",
+    "torch==2.0.1+cu117; sys_platform == 'win32'",
+    "torchaudio==2.0.2+cu117; sys_platform == 'win32'",
+    "torchvision==0.15.2+cu117; sys_platform == 'win32'",
 ]
 
 [dependency-groups]
@@ -18,3 +23,19 @@ dev = [
 [tool.ruff.lint]
 extend-select = ["I", "N", "PL", "UP", "E501", "NPY", "RUF100"]
 unfixable = ["F401"]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu117", marker = "sys_platform == 'win32'" },
+]
+torchvision = [
+    { index = "pytorch-cu117", marker = "sys_platform == 'win32'" },
+]
+torchaudio = [
+    { index = "pytorch-cu117", marker = "sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu117"
+url = "https://download.pytorch.org/whl/cu117"
+explicit = true

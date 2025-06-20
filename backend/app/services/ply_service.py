@@ -37,8 +37,10 @@ class PlyService:
             self.logger.info(result.stdout)
             if result.stderr:
                 self.logger.error(result.stderr)
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             self.logger.error(f"命令执行失败: {e}")
+            self.logger.error(f"stdout:\n{e.stdout}")
+            self.logger.error(f"stderr:\n{e.stderr}")
             raise
 
     def run_colmap(self):
@@ -50,12 +52,15 @@ class PlyService:
 
     def generate_colmap_input(self):
         """生成 COLMAP 输入"""
-        self.run_command(f"python ply/colmap_input.py --output_folder {self.working_dir}/colmap_input")
-
+        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/colmap_input.py"))
+        self.run_command(f"python {script_path} --input_folder {self.working_dir} --output_folder {self.working_dir}/colmap_input")
+    
     def run_evaluation(self):
         """运行评估脚本"""
-        self.run_command(f"python ply/eval.py --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path ../checkpoints/params_000007.ckpt --num_view 5")
-
+        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/eval.py"))
+        ckpt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/checkpoints/params_000007.ckpt"))
+        self.run_command(f"python {script_path} --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path {ckpt_path} --num_view 5")
+    
     def main(self):
         """主函数，整合所有步骤"""
         # 设置工作目录
