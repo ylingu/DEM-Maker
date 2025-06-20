@@ -350,10 +350,8 @@ if __name__ == "__main__":
             zs.append(transformed[2].item())
         zs_sorted = sorted(zs)
         # relaxed depth range
-        # depth_min = zs_sorted[int(len(zs) * .01)]
-        # depth_max = zs_sorted[int(len(zs) * .99)]
-        depth_min = zs_sorted[int(len(zs) * .05)]
-        depth_max = zs_sorted[int(len(zs) * .95)]
+        depth_min = zs_sorted[int(len(zs) * .01)]
+        depth_max = zs_sorted[int(len(zs) * .99)]
 
         depth_ranges.append((depth_min, depth_max))
     print("depth_ranges[0]\n", depth_ranges[0], end="\n\n")

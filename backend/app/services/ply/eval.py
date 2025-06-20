@@ -340,12 +340,12 @@ if __name__ == "__main__":
 
     # Stereo fusion options
     parser.add_argument("--display", action="store_true", default=False, help="display depth images and masks")
-    parser.add_argument("--geo_pixel_thres", type=float, default=0.5,
+    parser.add_argument("--geo_pixel_thres", type=float, default=1.0,
                         help="pixel threshold for geometric consistency filtering")
-    parser.add_argument("--geo_depth_thres", type=float, default=0.005,
+    parser.add_argument("--geo_depth_thres", type=float, default=0.01,
                         help="depth threshold for geometric consistency filtering")
-    parser.add_argument("--geo_mask_thres", type=int, default=8, help="threshold for geometric consistency filtering")
-    parser.add_argument("--photo_thres", type=float, default=0.7,
+    parser.add_argument("--geo_mask_thres", type=int, default=5, help="threshold for geometric consistency filtering")
+    parser.add_argument("--photo_thres", type=float, default=0.5,
                         help="threshold for photometric consistency filtering")
 
     # parse arguments and check
