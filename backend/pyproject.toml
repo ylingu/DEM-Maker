@@ -6,7 +6,6 @@ requires-python = ">=3.12"
 dependencies = [
     "djitellopy>=2.5.0",
     "fastapi[standard]>=0.115.12",
-    "rasterio>=1.4.3",
 ]
 
 [dependency-groups]
