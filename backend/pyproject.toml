@@ -10,9 +10,14 @@ dependencies = [
     "rasterio",
     "plyfile",
     "tensorboard",
+    "opencv-python",
     "torch==2.0.1+cu117; sys_platform == 'win32'",
     "torchaudio==2.0.2+cu117; sys_platform == 'win32'",
     "torchvision==0.15.2+cu117; sys_platform == 'win32'",
+    "torch>=2.0.1",
+    "torchvision>=0.15.2",
+    "numpy>=1.24.4",
+    "pillow>=10.4.0",
 ]
 
 [dependency-groups]

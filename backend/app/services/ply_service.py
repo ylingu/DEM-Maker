@@ -6,6 +6,7 @@ import subprocess
 class PlyService:
     def __init__(self, working_dir='tello'):
         self.working_dir = working_dir
+        self.colmap_exe = os.path.abspath(os.path.join("..","colmap","bin","colmap.exe"))
 
         # 配置日志
         logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -32,6 +33,22 @@ class PlyService:
         self.logger.info(f"运行命令: {command}")
         try:
             result = subprocess.run(
+                command, shell=False, text=True, capture_output=True, check=True
+            )
+            self.logger.info(result.stdout)
+            if result.stderr:
+                self.logger.error(result.stderr)
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"命令执行失败: {e}")
+            self.logger.error(f"stdout:\n{e.stdout}")
+            self.logger.error(f"stderr:\n{e.stderr}")
+            raise
+
+    def run_command2(self,command):
+        """运行命令并打印输出"""
+        self.logger.info(f"运行命令: {command}")
+        try:
+            result = subprocess.run(
                 command, shell=True, text=True, capture_output=True, check=True
             )
             self.logger.info(result.stdout)
@@ -46,20 +63,39 @@ class PlyService:
     def run_colmap(self):
         """运行 COLMAP 相关命令"""
         os.makedirs(os.path.join(self.working_dir, "sparse"), exist_ok=True)
-        self.run_command(f"colmap feature_extractor --database_path {self.working_dir}/database.db --image_path {self.working_dir}/images --ImageReader.single_camera 1")
-        self.run_command(f"colmap exhaustive_matcher --database_path {self.working_dir}/database.db")
-        self.run_command(f"colmap mapper --database_path {self.working_dir}/database.db --image_path {self.working_dir}/images --output_path {self.working_dir}/sparse")
+        
+        self.run_command([
+            self.colmap_exe,
+            "feature_extractor",
+            "--database_path", os.path.join(self.working_dir, "database.db"),
+            "--image_path", os.path.join(self.working_dir, "images"),
+            "--ImageReader.single_camera", "1"
+        ])
+    
+        self.run_command([
+            self.colmap_exe,
+            "exhaustive_matcher",
+            "--database_path", os.path.join(self.working_dir, "database.db")
+        ])
+        
+        self.run_command([
+            self.colmap_exe,
+            "mapper",
+            "--database_path", os.path.join(self.working_dir, "database.db"),
+            "--image_path", os.path.join(self.working_dir, "images"),
+            "--output_path", os.path.join(self.working_dir, "sparse")
+        ])
 
     def generate_colmap_input(self):
         """生成 COLMAP 输入"""
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/colmap_input.py"))
-        self.run_command(f"python {script_path} --input_folder {self.working_dir} --output_folder {self.working_dir}/colmap_input")
+        self.run_command2(f"python {script_path} --input_folder {self.working_dir} --output_folder {self.working_dir}/colmap_input")
     
     def run_evaluation(self):
         """运行评估脚本"""
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/eval.py"))
         ckpt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/checkpoints/params_000007.ckpt"))
-        self.run_command(f"python {script_path} --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path {ckpt_path} --num_view 5")
+        self.run_command2(f"python {script_path} --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path {ckpt_path} --num_view 5")
     
     def main(self):
         """主函数，整合所有步骤"""
