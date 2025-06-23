@@ -6,7 +6,8 @@ import subprocess
 class PlyService:
     def __init__(self, working_dir='tello'):
         self.working_dir = working_dir
-        self.colmap_exe = os.path.abspath(os.path.join("..","colmap","bin","colmap.exe"))
+        self.colmap_exe = os.path.abspath(os.path.join("..","backend","app","data","colmap","bin","colmap.exe"))
+        self.ckpt_path = os.path.abspath(os.path.join("..","backend","app","data","checkpoints","params_000007.ckpt"))
 
         # 配置日志
         logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -94,8 +95,7 @@ class PlyService:
     def run_evaluation(self):
         """运行评估脚本"""
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/eval.py"))
-        ckpt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/checkpoints/params_000007.ckpt"))
-        self.run_command2(f"python {script_path} --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path {ckpt_path} --num_view 5")
+        self.run_command2(f"python {script_path} --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path {self.ckpt_path} --num_view 5")
     
     def main(self):
         """主函数，整合所有步骤"""
