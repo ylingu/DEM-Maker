@@ -91,6 +91,3 @@ uv run nuitka backend-x86_64-pc-windows-msvc.py
 ```bash
 pnpm tauri build
 ```
-
-### 4.COLMAP安装
-请先确保你已经在系统中正确安装了 COLMAP（https://colmap.github.io），并添加到系统 PATH 中。
