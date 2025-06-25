@@ -30,19 +30,13 @@
                         </el-icon>
                         原始图像
                     </el-menu-item>
-                    <el-menu-item index="3-2" @click="$router.push('/views/depth')">
-                        <el-icon>
-                            <ShadowIcon />
-                        </el-icon>
-                        深度图
-                    </el-menu-item>
-                    <el-menu-item index="3-3" @click="$router.push('/views/pointcloud')">
+                    <el-menu-item index="3-2" @click="$router.push('/views/pointcloud')">
                         <el-icon>
                             <Icon3d />
                         </el-icon>
                         点云
                     </el-menu-item>
-                    <el-menu-item index="3-4" @click="$router.push('/views/dem')">
+                    <el-menu-item index="3-3" @click="$router.push('/views/dem')">
                         <el-icon>
                             <ViewInArIcon />
                         </el-icon>
@@ -66,7 +60,6 @@ import TravelIcon from '../assets/icons/IconTravel.vue';
 import DashboardIcon from '../assets/icons/IconDashboard.vue';
 import ViewArrayIcon from '../assets/icons/IconViewArray.vue';
 import ImageIcon from '../assets/icons/IconImage.vue';
-import ShadowIcon from '../assets/icons/IconShadow.vue';
 import Icon3d from '../assets/icons/Icon3d.vue';
 import ViewInArIcon from '../assets/icons/IconViewInAr.vue';
 

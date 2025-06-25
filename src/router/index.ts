@@ -24,11 +24,6 @@ const router = createRouter({
               component: () => import("../components/Origin.vue"),
             },
             {
-              path: "depth",
-              name: "depth",
-              component: () => import("../components/Depth.vue"),
-            },
-            {
               path: "pointcloud",
               name: "pointcloud",
               component: () => import("../components/PointCloud.vue"),

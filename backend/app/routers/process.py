@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 import cv2
@@ -30,7 +31,7 @@ def process_pipeline(config: DemConfig, dem_service: DemService, temp_dir: Path)
     dem_service.generate_dem(str(temp_dir / "fused.ply"), config)
 
 
-async def handle_images(path: str, temp_dir: Path):
+def handle_images(path: str, temp_dir: Path):
     """保存上传的图片到临时文件夹"""
     image_dir = temp_dir / "images"
     image_dir.mkdir(parents=True, exist_ok=True)
@@ -58,7 +59,7 @@ async def handle_images(path: str, temp_dir: Path):
                 file_extension = image.suffix
                 filename = f"{image.stem}_{image.stat().st_mtime_ns}{file_extension}"
                 new_file_path = image_dir / filename
-                os.rename(image, new_file_path)
+                shutil.copy(image, new_file_path)
     # 如果是视频文件，每秒截取一帧保存到 image_dir
     elif os.path.isfile(path) and path.lower().endswith((".mp4", ".avi", ".mov")):
         cap = cv2.VideoCapture(path)
@@ -74,6 +75,7 @@ async def handle_images(path: str, temp_dir: Path):
                 filename = f"frame_{frame_count:08d}.jpg"
                 file_path = image_dir / filename
                 cv2.imwrite(str(file_path), frame)
+            frame_count += 1
 
         cap.release()
     else:
@@ -88,7 +90,7 @@ async def process_dem(
     temp_dir: Path = Depends(gettempdir),
 ):
     try:
-        await handle_images(request_data.path, temp_dir)
+        handle_images(request_data.path, temp_dir)
         background_tasks.add_task(
             process_pipeline, request_data.config, dem_service, temp_dir
         )

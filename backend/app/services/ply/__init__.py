@@ -1,3 +1,3 @@
-from ply_service import PlyService
+from .ply_service import PlyService
 
 __all__ = ["PlyService"]
