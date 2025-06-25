@@ -6,6 +6,10 @@ requires-python = ">=3.12"
 dependencies = [
     "djitellopy>=2.5.0",
     "fastapi[standard]>=0.115.12",
+    "joblib>=1.5.1",
+    "open3d>=0.19.0",
+    "pykrige>=1.7.2",
+    "rasterio>=1.4.3",
 ]
 
 [dependency-groups]
