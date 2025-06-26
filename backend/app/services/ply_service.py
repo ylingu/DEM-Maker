@@ -8,7 +8,8 @@ class PlyService:
         self.working_dir = working_dir
         self.colmap_exe = os.path.abspath(os.path.join("..","backend","app","data","colmap","bin","colmap.exe"))
         self.ckpt_path = os.path.abspath(os.path.join("..","backend","app","data","checkpoints","params_000007.ckpt"))
-
+        self.script_path1 = os.path.abspath(os.path.join("..","backend","app","services", "ply/colmap_input.py"))
+        self.script_path2 = os.path.abspath(os.path.join("..","backend","app","services", "ply/eval.py"))
         # 配置日志
         logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
         self.logger = logging.getLogger(__name__)
@@ -89,16 +90,17 @@ class PlyService:
 
     def generate_colmap_input(self):
         """生成 COLMAP 输入"""
-        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/colmap_input.py"))
-        self.run_command2(f"python {script_path} --input_folder {self.working_dir} --output_folder {self.working_dir}/colmap_input")
+        self.run_command2(f"python {self.script_path1} --input_folder {self.working_dir} --output_folder {self.working_dir}/colmap_input")
     
     def run_evaluation(self):
         """运行评估脚本"""
-        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ply/eval.py"))
-        self.run_command2(f"python {script_path} --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path {self.ckpt_path} --num_view 5")
+        self.run_command2(f"python {self.script_path2} --input_folder {self.working_dir}/colmap_input --output_folder {self.working_dir}/colmap_input/depths --checkpoint_path {self.ckpt_path} --num_view 5")
     
     def main(self):
         """主函数，整合所有步骤"""
+        # 设置环境变量，解决 OpenMP 冲突问题
+        os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+        
         # 设置工作目录
         os.chdir(self.working_dir)
 
